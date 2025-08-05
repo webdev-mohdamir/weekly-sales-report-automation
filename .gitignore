@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# Logs
+log.txt
+
+# Config (WHY SHOULD I SHOW YOU MY CREDENTIALS?)
+config/settings.py
+
+# Output
+output/
