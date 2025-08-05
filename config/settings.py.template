@@ -1,0 +1,7 @@
+EMAIL_CONFIG = {
+    "sender_email": "your_email@example.com",
+    "app_password": "your_app_password",
+    "receiver_email": "target_email@example.com",
+    "smtp_host": "smtp.yourhost.com",
+    "smtp_port": 465
+}
