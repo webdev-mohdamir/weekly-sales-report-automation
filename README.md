@@ -1,6 +1,8 @@
 # 🧾 Weekly Customer Spend Report Automation
 
-This project automates the process of generating a **weekly customer spend report** using sales data in CSV format. It filters the last 7 days, summarizes total spending per customer, and emails the result as a PDF.
+This project automates the generation of **weekly customer spend reports** using flexible data sources (CSV, Google Sheets, or SQL databases). It filters the last 7 days of sales data, summarizes customer spending, and emails the result as a CSV or PDF attachment.
+
+> 🔄 Modular, extensible, and production-ready.
 
 ---
 
@@ -8,24 +10,34 @@ This project automates the process of generating a **weekly customer spend repor
 
 ```
 
-01_project_weekly_report/
+weekly-sales-report-automation/
 │
 ├── data/
-│ └── sales_data.csv # Raw sales data (input)
+│ ├── sales_data.csv # Sample input data
+│ └── sales_data.db # SQLite database (optional)
 │
 ├── output/
-│ └── weekly_customer_spend.csv # Auto-generated summary (CSV)
+│ └── weekly_customer_spend.csv # Auto-generated weekly report
 │
 ├── src/
-│ ├── report.py # Main logic (load, transform, export)
-│ └── email_report.py # Email sending module
+│ ├── data_source.py # Central loader dispatch
+│ ├── data_source_csv.py
+│ ├── data_source_sql.py
+│ ├── data_source_gsheet.py
+│ ├── report.py # Report logic (filtering, grouping)
+| ├── db_setup.py # Optional: Create SQLite from CSV
+│ └── email_report.py # Email sending logic
 │
 ├── config/
-│ └── settings.py # Email credentials and config (excluded from GitHub)
+│ ├── credentials.json # Google API credentials for Google Sheets
+│ ├── settings.py # Main config (Why Should I Add In GIT Baka?)
+│ └── settings_template.py # Template for your own settings
 │
-├── run_report.py # Script to generate & email report
-├── requirements.txt # Python package dependencies
-├── log.txt # Logs of report runs
+├── run_report.py # CLI entry point
+├── requirements.txt # Python dependencies
+├── log.txt # Execution logs
+├── LICENSE # License information
+├── .gitignore # Git ignore file
 └── README.md # You're reading it!
 
 ```
@@ -34,58 +46,77 @@ This project automates the process of generating a **weekly customer spend repor
 
 ## ⚙️ Setup Instructions
 
-### 1. Install Dependencies
+### 1. Clone the Repo
 
-Create a virtual environment (recommended):
+```bash
+git clone https://github.com/webdev-mohdamir/weekly-sales-report-automation.git
+cd weekly-sales-report-automation
+```
+
+---
+
+### 2. Install Dependencies
+
+It's recommended to use a virtual environment:
 
 ```bash
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate      # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
 ---
 
-### 2. Add Your Email Config
+### 3. Configure Your Settings
 
-> ⚠️ Do NOT upload real credentials to GitHub.
-
-Edit `config/settings.py` with your SMTP details:
-
-```python
-EMAIL_CONFIG = {
-    "sender_email": "your_email@example.com",
-    "app_password": "your_app_password",
-    "receiver_email": "target_email@example.com",
-    "smtp_host": "smtp.yourhost.com",
-    "smtp_port": 465
-}
-```
-
----
-
-### 3. Run the Script Manually
+Copy the template and edit with your credentials and default values:
 
 ```bash
-python run_report.py
+cp config/settings_template.py config/settings.py
+```
+
+Customize these settings:
+
+- Data source (CSV, SQLite, MySQL, PostgreSQL, Google Sheets)
+- Google Sheet names (if used)
+- Database credentials
+- Email SMTP configuration
+
+---
+
+## 🚀 Usage
+
+### Run Manually
+
+```bash
+python run_report.py --source csv
+python run_report.py --source sqlite
+python run_report.py --source gsheet
+```
+
+If `--source` is not passed, it defaults to what's set in `settings.py`.
+
+You can also provide additional kwargs like when using `--source gsheet`:
+
+```bash
+python run_report.py --source gsheet --sheet_name "My Sheet" --worksheet_name "My Worksheet"
 ```
 
 ---
 
-### 4. Schedule Automation (Windows Task Scheduler)
+### Schedule Weekly Execution
 
-This project can be automated to run weekly using Windows Task Scheduler.
-Refer to your `run_report.py` as the script to execute.
+Use Windows Task Scheduler, `cron`, or GitHub Actions to run `run_report.py` weekly.
 
 ---
 
 ## 📬 What It Does
 
-- ✅ Loads data from `data/sales_data.csv`
-- ✅ Filters last 7 days from a fixed or current date
+- ✅ Loads data from the selected source (CSV, GSheet, DB)
+- ✅ Filters last 7 days of data
 - ✅ Summarizes spending by customer
-- ✅ Saves to `output/weekly_customer_spend.csv`
-- ✅ Emails report as attachment using SMTP
+- ✅ Outputs a clean CSV
+- ✅ Emails the report automatically
 
 ---
 
@@ -98,7 +129,15 @@ CUST002,1950
 ...
 ```
 
-You’ll receive this report as an email attachment weekly.
+---
+
+## 🧩 Supported Data Sources
+
+- **CSV** (default fallback)
+- **Google Sheets** (with `gspread`)
+- **SQLite**
+- **MySQL**
+- **PostgreSQL**
 
 ---
 
@@ -108,4 +147,4 @@ MIT License
 
 ---
 
-Made with 💻 by Mohd Amir (Webdev Amir)
+Made with 💻 by [Mohd Amir](https://github.com/webdev-mohdamir)

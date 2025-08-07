@@ -1,7 +1,35 @@
+# Default Data Source
+DATA_SOURCE = "csv"  # options: csv, sqlite, mysql, postgres, gsheet
+
+# File paths
+CSV_FILE_PATH = "data/sales_data.csv"
+SQLITE_DB_PATH = "data/sales_data.db"
+
+# Google Sheet
+GSHEET_SHEET_NAME = "SalesData"
+GSHEET_WORKSHEET_NAME = "Sheet1"
+
+# MySQL Config
+MYSQL_CONFIG = {
+    "host": "localhost",
+    "user": "your_user",
+    "password": "your_pass",
+    "database": "your_db"
+}
+
+# PostgreSQL Config
+POSTGRES_CONFIG = {
+    "host": "localhost",
+    "user": "your_user",
+    "password": "your_pass",
+    "dbname": "your_db"
+}
+
+# Email Settings
 EMAIL_CONFIG = {
     "sender_email": "your_email@example.com",
     "app_password": "your_app_password",
-    "receiver_email": "target_email@example.com",
-    "smtp_host": "smtp.yourhost.com",
+    "receiver_email": "receiver@example.com",
+    "smtp_host": "smtp.example.com",
     "smtp_port": 465
 }

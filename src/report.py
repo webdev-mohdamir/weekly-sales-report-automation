@@ -1,22 +1,53 @@
+import traceback
 import pandas as pd
-from datetime import datetime as date
 import matplotlib.pyplot as plt
+from datetime import datetime as date
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
-
-# PDF path
-pdf_path = "output/weekly_customer_spend.pdf"
-
-# Chart paths
-chart_path = "output/top5_chart.png"
+from reportlab.lib.styles import getSampleStyleSheet
+from config.settings import PDF_PATH, CHART_PATH
+from src.data_source import load_data
+from src.email_report import send_email_report
 
 
-def load_data(path):
-    df = pd.read_csv(path)
-    df["invoice_date"] = pd.to_datetime(df["invoice_date"], format="%d-%m-%Y")
-    return df
+def log(msg):
+    with open("log.txt", "a", encoding="utf-8") as f:
+        f.write(f"[{date.now()}] {msg}\n")
+
+
+def log_exception():
+    with open("log.txt", "a", encoding="utf-8") as f:
+        f.write(f"[{date.now()}] ERROR:\n")
+        f.write(traceback.format_exc())
+        print(traceback.format_exc())
+
+
+def generate_and_send_report(
+    source_type=None, **kwargs
+):
+    try:
+        log(f"📦 Loading data from {source_type} source...")
+        df = load_data(source_type=source_type, **kwargs)
+
+        recent = filter_last_7_days(df)
+        recent = add_sale_amount(recent)
+        summary = summarize_sales(recent)
+
+        log("📦 Saving report to CSV...")
+        save_report(summary, "output/weekly_customer_spend.csv")
+
+        log("📦 Sending email report...")
+
+        # Change the subject and body as per your needs
+        send_email_report(
+            subject="Weekly Customer Spend Report",
+            body="Attached is the latest customer spend summary.",
+            attachment_path="output/weekly_customer_spend.csv",
+        )
+
+    except Exception:
+        log_exception()
 
 
 def filter_last_7_days(df, current_date=None):
@@ -49,11 +80,11 @@ def summarize_sales(df):
     plt.tight_layout()
 
     # Save the image
-    plt.savefig(chart_path)
+    plt.savefig(CHART_PATH)
     plt.close()
 
     # Set up PDF
-    doc = SimpleDocTemplate(pdf_path, pagesize=A4)
+    doc = SimpleDocTemplate(PDF_PATH, pagesize=A4)
     styles = getSampleStyleSheet()
     elements = []
 
@@ -63,7 +94,7 @@ def summarize_sales(df):
     elements.append(Spacer(1, 12))
 
     # Add chart
-    elements.append(Image(chart_path, width=400, height=200))
+    elements.append(Image(CHART_PATH, width=400, height=200))
     elements.append(Spacer(1, 12))
 
     # Table: Top 5 customers
@@ -86,7 +117,7 @@ def summarize_sales(df):
 
     # Build the PDF
     doc.build(elements)
-    print("📄 PDF report generated:", pdf_path)
+    print("📄 PDF report generated:", PDF_PATH)
 
     return summary
 

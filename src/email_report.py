@@ -2,17 +2,18 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
+from config.settings import EMAIL_CONFIG
 
 
 def send_email_report(
-    sender_email,
-    app_password,
-    receiver_email,
     subject,
     body,
     attachment_path,
-    host="smtp.gmail.com",
-    port=587
+    sender_email=EMAIL_CONFIG["sender_email"],
+    app_password=EMAIL_CONFIG["app_password"],
+    receiver_email=EMAIL_CONFIG["receiver_email"],
+    host=EMAIL_CONFIG["smtp_host"],
+    port=EMAIL_CONFIG["smtp_port"],
 ):
     print("Creating the email message...")
     msg = MIMEMultipart()

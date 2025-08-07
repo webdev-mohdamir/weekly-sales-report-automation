@@ -8,6 +8,8 @@ log.txt
 
 # Config (WHY SHOULD I SHOW YOU MY CREDENTIALS?)
 config/settings.py
+config/credentials.json
 
 # Output
 output/
+
